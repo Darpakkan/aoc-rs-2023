@@ -96,7 +96,7 @@ fn main() {
         idx+=1;
     }
 
-    println!("{}", sum);
+    println!("sum: {}", sum);
 
     // part B
     let mut sum: usize = 0;
@@ -105,5 +105,5 @@ fn main() {
         sum += find_res_line(line);
     }
 
-    println!("{}", sum);
+    println!("sum: {}", sum);
 }
