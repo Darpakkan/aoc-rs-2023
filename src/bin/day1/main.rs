@@ -65,53 +65,15 @@ fn main() {
 
     let lines: Vec<String> = contents.split('\n').map(|a| String::from(a)).collect();
 
-    let mut sum: usize = 0;
+   let sum: usize = contents.lines().flat_map(|line| {
+        let first_digit = digits.iter().filter_map(|&d| line.find(d).map(|pos| (d, pos))).min_by_key(|&(_, pos)| pos);
+        let last_digit = digits.iter().filter_map(|&d| line.rfind(d).map(|pos| (d, pos))).max_by_key(|&(_, pos)| pos);
 
-    for line in lines {
+        let fd = first_digit.and_then(|(d, _)| d.parse::<usize>().ok()).or_else(|| digit_mapping.get(&first_digit.map(|(d, _)| d).unwrap()).cloned()).unwrap_or(0);
+        let ld = last_digit.and_then(|(d, _)| d.parse::<usize>().ok()).or_else(|| digit_mapping.get(&last_digit.map(|(d, _)| d).unwrap()).cloned()).unwrap_or(fd);
 
-        let mut first_digit: &str = "";
-        let mut last_digit: &str = "";
-
-        // Forward
-        let mut first_position: usize = 999;
-        for digit in digits {
-            let pos = line.find(digit).unwrap_or(first_position);
-            if pos < first_position {
-                first_position = pos;
-                first_digit = digit;
-            }
-        }
-
-        // Reverse
-        let mut last_position: usize = 0;
-        for digit in digits {
-            let pos = line.rfind(digit).unwrap_or(last_position);
-            if pos > last_position {
-                last_position = pos;
-                last_digit = digit;
-            }
-        }
-
-        let mut fd = 0;
-        let mut ld = 0;
-
-        if first_digit.len() == 1 {
-            fd = first_digit.chars().nth(0).unwrap().to_digit(10).unwrap() as usize;
-        } else {
-            fd = *digit_mapping.get(first_digit).unwrap();
-        }
-
-        sum += 10*fd;
-
-        if last_digit.len() == 1 {
-            ld = last_digit.chars().nth(0).unwrap().to_digit(10).unwrap() as usize;
-        } else {
-            ld = *digit_mapping.get(last_digit).unwrap_or(&fd);
-        }
-
-        sum += ld;
-        
-    }
+        Some(10 * fd + ld)
+    }).sum();
 
     println!("sum: {:?}", sum);
 }
